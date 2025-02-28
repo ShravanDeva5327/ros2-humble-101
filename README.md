@@ -344,3 +344,103 @@ This outputs:
 ```
 /turtle1/cmd_vel
 ```
+
+## Understanding Services
+Services provide a synchronous, call-and-response method of communication in ROS 2—different from the continuous data stream of topics. They allow one node (the client) to send a request to another node (the server) and wait for a response.
+
+![Service Communication 1](Service1.gif)
+![Service Communication 2](Service2.gif)
+
+Start the turtlesim nodes in separate terminals:
+```
+ros2 run turtlesim turtlesim_node
+```
+```
+ros2 run turtlesim turtle_teleop_key
+```
+
+### ros2 service list
+To list all active services, run:
+```
+ros2 service list
+```
+
+This will display services such as `/clear`, `/kill`, `/reset`, `/spawn`, `/turtle1/set_pen`, `/turtle1/teleport_absolute`, and `/turtle1/teleport_relative`.
+
+### ros2 service type
+To find out the type of a service, use the command:
+```
+ros2 service type <service_name>
+```
+For example, to check the type of the /clear service:
+```
+ros2 service type /clear
+```
+This should return:
+```
+std_srvs/srv/Empty
+```
+
+You can also list services with their types using:
+```
+ros2 service list -t
+```
+
+### ros2 service find
+If you want to find all the services of a specific type, you can use the command:
+```
+ros2 service find <type_name>
+```
+
+```
+ros2 service find std_srvs/srv/Empty
+```
+This should return:
+```
+/clear
+/reset
+```
+
+### ros2 service find
+To view the structure of a service's request and response, use:
+```
+ros2 interface show <type_name>
+```
+
+```
+ros2 interface show turtlesim/srv/Spawn
+```
+This will return:
+```
+float32 x
+float32 y
+float32 theta
+string name # Optional.  A unique name will be created and returned if this is empty
+---
+string name
+```
+
+The `---` separates the request structure (above) from the response structure (below)
+
+### ros2 service call
+Now that you know what a service type is, how to find a service’s type, and how to find the structure of that type’s arguments, you can call a service using:
+
+```
+ros2 service call <service_name> <service_type> <arguments>
+```
+
+The `<arguments>` part is optional. For example, Empty typed services don’t have any arguments.
+```
+ros2 service call /spawn turtlesim/srv/Spawn "{x: 2, y: 2, theta: 0.2, name: ''}"
+```
+
+This should return:
+```
+requester: making request: turtlesim.srv.Spawn_Request(x=2.0, y=2.0, theta=0.2, name='')
+
+response:
+turtlesim.srv.Spawn_Response(name='turtle2')
+```
+
+This command spawns a new turtle in the turtlesim window.
+```
