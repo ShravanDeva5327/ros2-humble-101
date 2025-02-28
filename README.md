@@ -51,3 +51,60 @@ Forgetting to source these setup.bash files is a common mistake that often leads
 
 Always ensure you source the appropriate setup file(s) in every new terminal session before running any ROS2 commands.
 ```
+## Turtlesim
+**Turtlesim** is a lightweight simulator designed for learning the basics of ROS 2. It visually demonstrates how ROS 2 operates, helping you understand nodes, topics, and services in a fun and interactive way.
+
+### 1. Installation
+Start by sourcing your ROS 2 setup files in a new terminal (not needed if you sourced setup file in bashrc), then install turtlesim:
+
+```bash
+sudo apt update
+sudo apt install ros-humble-turtlesim
+```
+
+### 2. Starting Turtlesim
+Launch the turtlesim node:
+```bash
+ros2 run turtlesim turtlesim_node
+```
+In another terminal (after sourcing ROS 2), run the teleop node to control the turtle:
+```bash
+ros2 run turtlesim turtle_teleop_key
+```
+### 3. Explore ROS Components
+You can list nodes, topics, services, and actions to see how components interact:
+
+```bash
+ros2 node list
+ros2 topic list
+ros2 service list
+ros2 action list
+```
+More details about these components are discussed later.
+
+## rqt
+**rqt** is a graphical user interface tool that provides a more intuitive way to interact with ROS 2 components, complementing command line operations.
+
+### 1. Installation
+Open a new terminal and install rqt along with its plugins:
+
+```bash
+sudo apt update
+sudo apt install '~nros-humble-rqt*'
+```
+
+### 2. Launching rqt
+Start rqt by running:
+
+```bash
+rqt
+```
+Once open, navigate to `Plugins > Services > Service Caller` to interact with ROS 2 services.
+
+### 3. Using rqt to Spawn a New Turtle
+- In the Service Caller window, select the /spawn service.
+- Enter a unique name for the new turtle (e.g., turtle2) and valid coordinates (e.g., x=1.0, y=1.0).
+- Click the Call button to execute the service and spawn a new turtle.
+
+`Note: If you try to spawn a turtle with a name that already exists (like turtle1), you will receive an error.`
+
