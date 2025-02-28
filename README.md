@@ -1,5 +1,7 @@
 # ROS2 Humble 101 
 
+![Alt Text 1](atlas.gif) ![Alt Text 2](atlas2.gif)
+
 ## Installation
 
 For detailed instructions on installing ROS2 Humble, please refer to the official [ROS2 Humble Installation Guide](https://docs.ros.org/en/humble/Installation.html).
