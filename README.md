@@ -64,11 +64,11 @@ sudo apt install ros-humble-turtlesim
 
 ### 2. Starting Turtlesim
 Launch the turtlesim node:
-```bash
+```
 ros2 run turtlesim turtlesim_node
 ```
 In another terminal (after sourcing ROS 2), run the teleop node to control the turtle:
-```bash
+```
 ros2 run turtlesim turtle_teleop_key
 ```
 ### 3. Explore ROS Components
@@ -96,7 +96,7 @@ sudo apt install '~nros-humble-rqt*'
 ### 2. Launching rqt
 Start rqt by running:
 
-```bash
+```
 rqt
 ```
 Once open, navigate to `Plugins > Services > Service Caller` to interact with ROS 2 services.
@@ -107,4 +107,96 @@ Once open, navigate to `Plugins > Services > Service Caller` to interact with RO
 - Click the Call button to execute the service and spawn a new turtle.
 
 `Note: If you try to spawn a turtle with a name that already exists (like turtle1), you will receive an error.`
+
+## Understanding Nodes
+Each node in ROS 2 is designed to perform a single, modular function—like controlling wheel motors or publishing sensor data from a laser range-finder. In a complete robotic system, many nodes work in concert, and a single executable can host one or more nodes.
+
+![Nodes in ROS 2](Nodes1.gif)
+
+A full robotic system is comprised of many nodes working in concert. In ROS 2, a single executable (C++ program, Python program, etc.) can contain one or more nodes.
+
+### ros2 run
+The `ros2 run` command launches an executable from a package. For example, to start the turtlesim node, open a new terminal and run:
+
+```
+ros2 run turtlesim turtlesim_node
+```
+Here, `turtlesim` is the package name and `turtlesim_node` is the executable.
+We still don’t know the node name, however. You can find node names by using `ros2 node list`.
+
+### ros2 node list
+`ros2 node list` will show you the names of all running nodes.
+
+Open a new terminal while turtlesim is still running in the other one, and enter the following command:
+```
+ros2 node list
+```
+The terminal will return the node name:
+```
+/turtlesim
+```
+Open another new terminal and start the teleop node, Return to the terminal where you ran ros2 node list and run it again. You will now see the names of two active nodes:
+```
+/turtlesim
+/teleop_turtle
+```
+
+### Remapping
+Remapping lets you reassign default node properties (like node name, topic names, etc.). For example, to remap the `/turtlesim` node to a custom name `/my_turtle`, run:
+
+```
+ros2 run turtlesim turtlesim_node --ros-args --remap __node:=my_turtle
+```
+
+After this, `ros2 node list` will display:
+
+```
+/my_turtle
+/turtlesim
+/teleop_turtle
+```
+
+### ros2 node info
+To see detailed information about a node—its publishers, subscribers, services, and actions—use:
+```
+ros2 node info <node_name>
+```
+For example, to inspect the node `my_turtle`:
+```
+ros2 node info /my_turtle
+```
+
+This command displays the node’s ROS graph connections.
+```
+/my_turtle
+  Subscribers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /turtle1/cmd_vel: geometry_msgs/msg/Twist
+  Publishers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rosout: rcl_interfaces/msg/Log
+    /turtle1/color_sensor: turtlesim/msg/Color
+    /turtle1/pose: turtlesim/msg/Pose
+  Service Servers:
+    /clear: std_srvs/srv/Empty
+    /kill: turtlesim/srv/Kill
+    /my_turtle/describe_parameters: rcl_interfaces/srv/DescribeParameters
+    /my_turtle/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
+    /my_turtle/get_parameters: rcl_interfaces/srv/GetParameters
+    /my_turtle/list_parameters: rcl_interfaces/srv/ListParameters
+    /my_turtle/set_parameters: rcl_interfaces/srv/SetParameters
+    /my_turtle/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
+    /reset: std_srvs/srv/Empty
+    /spawn: turtlesim/srv/Spawn
+    /turtle1/set_pen: turtlesim/srv/SetPen
+    /turtle1/teleport_absolute: turtlesim/srv/TeleportAbsolute
+    /turtle1/teleport_relative: turtlesim/srv/TeleportRelative
+  Service Clients:
+
+  Action Servers:
+    /turtle1/rotate_absolute: turtlesim/action/RotateAbsolute
+  Action Clients:
+```
+
+You can run the same command for `/teleop_turtle` to compare their connections.
 
