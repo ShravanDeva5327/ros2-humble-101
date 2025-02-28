@@ -200,3 +200,147 @@ This command displays the node’s ROS graph connections.
 
 You can run the same command for `/teleop_turtle` to compare their connections.
 
+## Understanding Topics
+ROS 2 decomposes complex systems into modular nodes that communicate by exchanging messages over topics. Topics act as a communication bus, allowing nodes to publish data to and subscribe to data from one or more topics. Topics are a vital element of the ROS graph that act as a bus for nodes to exchange messages.
+
+![Topics in ROS 2](Topic1.gif)
+
+A node may publish data to any number of topics and simultaneously have subscriptions to any number of topics.
+
+![Topics in ROS 2](Topic2.gif)
+
+Topics are one of the main ways in which data is moved between nodes and therefore between different parts of the system.
+
+By now you should be comfortable starting up turtlesim.
+
+Open a new terminal and run:
+```
+ros2 run turtlesim turtlesim_node
+```
+Open another terminal and run:
+```
+ros2 run turtlesim turtle_teleop_key
+```
+### rqt graph
+We can use `rqt_graph` to visualize the changing nodes and topics, as well as the connections between them.
+To run rqt_graph, open a new terminal and enter the command:
+```
+rqt_graph
+```
+
+You can also open rqt_graph by opening `rqt` and selecting **Plugins > Introspection > Node Graph**.
+
+### ros2 topic list
+Running the `ros2 topic list` command in a new terminal will return a list of all the topics currently active in the system:
+```
+/parameter_events
+/rosout
+/turtle1/cmd_vel
+/turtle1/color_sensor
+/turtle1/pose
+```
+ros2 topic list -t will return the same list of topics, this time with the topic type appended in brackets:
+```
+/parameter_events [rcl_interfaces/msg/ParameterEvent]
+/rosout [rcl_interfaces/msg/Log]
+/turtle1/cmd_vel [geometry_msgs/msg/Twist]
+/turtle1/color_sensor [turtlesim/msg/Color]
+/turtle1/pose [turtlesim/msg/Pose]
+```
+
+**Note:** The /parameter_events and /rosout topics run continuously in the background to ensure that parameter updates and centralized logging always work seamlessly.
+
+### ros2 topic echo
+To see the data being published on a topic, use:
+```
+ros2 topic echo <topic_name>
+```
+
+Since we know that `/teleop_turtle` publishes data to `/turtlesim` over the `/turtle1/cmd_vel topic`, let’s use **echo** to introspect that topic:
+```
+ros2 topic echo /turtle1/cmd_vel
+```
+
+Initially, nothing appears because the command is waiting for `/teleop_turtle` to publish. In the `turtle_teleop_key `terminal, use the arrow keys to move the turtle, and you'll see its position data echoed with every move.
+
+### ros2 topic info
+To get detailed info about a topic, use:
+```
+ros2 topic info <topic_name>
+```
+
+try running:
+```
+ros2 topic info /turtle1/cmd_vel
+```
+
+This Should return:
+```
+Type: geometry_msgs/msg/Twist
+Publisher count: 1
+Subscription count: 2
+```
+
+### ros2 interface show
+To learn details of a `msg_type`, use:
+```
+ros2 interface show <msg_type>
+```
+
+Recall that the cmd_vel topic has the type `geometry_msgs/msg/Twist`
+
+```
+ros2 interface show geometry_msgs/msg/Twist
+```
+The above command yields
+```
+# This expresses velocity in free space broken into its linear and angular parts.
+
+    Vector3  linear
+            float64 x
+            float64 y
+            float64 z
+    Vector3  angular
+            float64 x
+            float64 y
+            float64 z
+```
+
+The `/turtlesim` node expects a message with two three-element vectors—linear and angular—matching the echoed data from `/teleop_turtle`.
+
+### ros2 topic pub
+With the message structure in hand, you can publish data directly using:
+```
+ros2 topic pub <topic_name> <msg_type> '<args>'
+```
+Here, `'<args>'` holds the data in the discovered structure. Since the turtle (and real robots) need a continuous command stream, use this YAML-formatted command to keep it moving:
+```
+ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
+```
+
+With no command-line options, `ros2 topic pub publishes` the command in a steady stream at 1 Hz.
+
+Sometimes you might want to publish just one message instead of a continuous stream. In that case, use the `--once` option: 
+```
+ros2 topic pub --once -w 2 /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
+```
+`--once` is an optional argument meaning “publish one message then exit”.
+
+`-w 2` is an optional argument meaning “wait for two matching subscriptions”. This is needed because we have both turtlesim and the topic echo subscribed.
+
+In this case, your turtle will move only by a part of circle.
+
+### ros2 topic find
+To list a list of available topics of a given type use:
+```
+ros2 topic find <topic_type>
+```
+Recall that the `cmd_vel` topic has the type `geometry_msgs/msg/Twist`
+
+```
+ros2 topic find geometry_msgs/msg/Twist
+```
+This outputs:
+```
+/turtle1/cmd_vel
+```
