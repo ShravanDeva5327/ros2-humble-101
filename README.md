@@ -401,7 +401,7 @@ This should return:
 /reset
 ```
 
-### ros2 service find
+### ros2 interface show
 To view the structure of a service's request and response, use:
 ```
 ros2 interface show <type_name>
@@ -443,4 +443,3 @@ turtlesim.srv.Spawn_Response(name='turtle2')
 ```
 
 This command spawns a new turtle in the turtlesim window.
-```
