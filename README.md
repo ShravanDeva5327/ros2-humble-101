@@ -1,6 +1,6 @@
 # ROS2 Humble 101 
 
-![Alt Text 1](atlas.gif) ![Alt Text 2](atlas2.gif)
+![Alt Text 1](atlas.gif)
 
 ## Installation
 
